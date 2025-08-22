@@ -21,6 +21,7 @@ public class Pichu {
         boolean saidBye = false;
 
         while (!saidBye) {
+
             String command = input.nextLine();
 
             if (command.toLowerCase().startsWith("mark")) {
