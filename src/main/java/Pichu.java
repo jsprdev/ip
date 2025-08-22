@@ -127,6 +127,11 @@ public class Pichu {
                 continue;
             }
 
+            enum MainWord {
+                bye,
+                list
+            }
+
             switch (command) {
                 case "bye":
                     System.out.println("""
