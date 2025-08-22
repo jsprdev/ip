@@ -143,7 +143,7 @@ public class Pichu {
                 default:
                     cache.add(new Task(command));
                     System.out.println("____________________________________________________________\n " +
-                            "OOPS!!! I'm sorry, I dont know what that means :-(" +
+                            "OOPS!!! I'm sorry, I dont know what that means! :-(" +
                             "\n___________________________________________________________");
                     break;
             }
