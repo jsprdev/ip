@@ -116,6 +116,15 @@ public class Pichu {
                         "Now you have " + cache.size() + " task(s) in the list." +
                         "\n___________________________________________________________");
                 continue;
+            } else if (command.toLowerCase().startsWith("delete")) {
+                int index = Integer.parseInt(command.substring(7));
+                cache.remove(index);
+
+                System.out.println("""
+                    ____________________________________________________________
+                    Noted, I've removed this task!
+                    ___________________________________________________________""");
+                continue;
             }
 
             switch (command) {
