@@ -23,8 +23,20 @@ public class Task {
         isCompleted = completed;
     }
 
+    @Override
     public String toString(){
         return (isCompleted ? "[X]" : "[ ]") + " " + name;
+    }
+
+    public String getType() {
+        return "-";
+    };
+
+    public String getCompletion() {
+        if (isCompleted) {
+            return "X";
+        }
+        return " ";
     }
 
 }
