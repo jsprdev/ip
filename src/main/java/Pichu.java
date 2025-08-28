@@ -1,9 +1,7 @@
-import main.java.Deadline;
-import main.java.Event;
-import main.java.Task;
-import main.java.ToDo;
+import main.java.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Pichu {
@@ -19,17 +17,26 @@ public class Pichu {
         ArrayList<Task> cache = new ArrayList<>();
         Scanner input = new Scanner(System.in);
         boolean saidBye = false;
+        Storage storage = new Storage("data/tasks.txt");
+
+
+        // Loading tasks from ./data/tasks.txt
+        List<String> savedTasks = storage.loadTasks();
+        for (String taskData : savedTasks) {
+
+            Task task = parseTaskFromString(taskData);
+            if (task != null) {
+                cache.add(task);
+            }
+        }
 
         while (!saidBye) {
-
             String command = input.nextLine();
 
             if (command.toLowerCase().startsWith("mark")) {
-
                 int index = Integer.parseInt(command.substring(5));
-
                 cache.get(index - 1).setCompleted(true);
-
+                storage.saveAllTasks(cache);
                 System.out.println("""
                     ____________________________________________________________
                     Nice! I've marked this task as done:
@@ -40,7 +47,7 @@ public class Pichu {
             } else if (command.toLowerCase().startsWith("unmark")) {
                 int index = Integer.parseInt(command.substring(7));
                 cache.get(index - 1).setCompleted(false);
-
+                storage.saveAllTasks(cache);
                 System.out.println("""
                     ____________________________________________________________
                     OK, I've marked this taks as not done yet:
@@ -56,15 +63,15 @@ public class Pichu {
                             ___________________________________________________________""");
                 }
                 cache.add(new ToDo(command));
+                storage.saveTask(cache.get(cache.size() - 1).toFileFormat());
 
                 System.out.println("____________________________________________________________\n " +
                         "added: " + command +
                         "Now you have " + cache.size() + " in the list." +
                         "\n___________________________________________________________");
+
                 continue;
             } else if (command.toLowerCase().startsWith("deadline")) {
-
-
                 String[] parts = command.split(" ", 2);
 
                 if (parts.length == 1) {
@@ -80,6 +87,7 @@ public class Pichu {
 
                 Deadline temp = new Deadline(description, byTime);
                 cache.add(temp);
+                storage.saveTask(temp.toFileFormat());
 
                 System.out.println("____________________________________________________________\n " +
                         "added:\n " +
@@ -108,6 +116,7 @@ public class Pichu {
 
                 Event temp = new Event(description, start, end);
                 cache.add(temp);
+                storage.saveTask(temp.toFileFormat());
 
                 System.out.println("____________________________________________________________\n " +
                         "added:\n " +
@@ -118,7 +127,8 @@ public class Pichu {
                 continue;
             } else if (command.toLowerCase().startsWith("delete")) {
                 int index = Integer.parseInt(command.substring(7));
-                cache.remove(index);
+                cache.remove(index - 1);
+                storage.saveAllTasks(cache);
 
                 System.out.println("""
                     ____________________________________________________________
@@ -162,5 +172,44 @@ public class Pichu {
                     break;
             }
         }
+    }
+
+    private static Task parseTaskFromString(String taskData) {
+        if (taskData == null || taskData.trim().isEmpty()) {
+            return null;
+        }
+
+        String[] parts = taskData.split("\\|");
+        if (parts.length < 3) {
+            return null;
+        }
+
+        String type = parts[0];
+        boolean isCompleted = parts[1].equals("1");
+        String description = parts[2];
+
+        Task task = null;
+
+        switch (type) {
+            case "T":
+                task = new ToDo(description);
+                break;
+            case "D":
+                if (parts.length >= 4) {
+                    task = new Deadline(description, parts[3]);
+                }
+                break;
+            case "E":
+                if (parts.length >= 5) {
+                    task = new Event(description, parts[3], parts[4]);
+                }
+                break;
+        }
+
+        if (task != null) {
+            task.setCompleted(isCompleted);
+        }
+
+        return task;
     }
 }
