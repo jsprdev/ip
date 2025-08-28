@@ -1,5 +1,9 @@
 import main.java.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -79,6 +83,7 @@ public class Pichu {
                             ____________________________________________________________
                              OOPS!!! The description of a deadline cannot be empty.
                             ___________________________________________________________""");
+                    continue;
                 }
 
                 String[] descriptionAndTime = parts[1].split("/by ", 2);
@@ -90,8 +95,8 @@ public class Pichu {
                 storage.saveTask(temp.toFileFormat());
 
                 System.out.println("____________________________________________________________\n " +
-                        "added:\n " +
-                        "[" + temp.getType() + "]" + "[" + temp.getCompletion() + "] " + description + " (by: " + byTime + ") \n" +
+                        "Got it. I've added this task:\n " +
+                        "  [" + temp.getType() + "][" + temp.getCompletion() + "] " + description + " (by: " + temp.getFormattedDeadline() + ")\n" +
                         "Now you have " + cache.size() + " task(s) in the list." +
                         "\n___________________________________________________________");
                 continue;
@@ -104,6 +109,7 @@ public class Pichu {
                             ____________________________________________________________
                              OOPS!!! The description of a event cannot be empty.
                             ___________________________________________________________""");
+                    continue;
                 }
 
                 String[] descriptionAndTime = parts[1].split("/from ", 2);
@@ -119,9 +125,9 @@ public class Pichu {
                 storage.saveTask(temp.toFileFormat());
 
                 System.out.println("____________________________________________________________\n " +
-                        "added:\n " +
-                        "[" + temp.getType() + "]" + "[" + temp.getCompletion() + "] " + description +
-                        " (from: " + start + " to: " + end + ") \n" +
+                        "Got it. I've added this task:\n " +
+                        "  [" + temp.getType() + "][" + temp.getCompletion() + "] " + description +
+                        " (from: " + temp.getFormattedStart() + " to: " + temp.getFormattedEnd() + ")\n" +
                         "Now you have " + cache.size() + " task(s) in the list." +
                         "\n___________________________________________________________");
                 continue;
@@ -165,7 +171,6 @@ public class Pichu {
 
 
                 default:
-                    cache.add(new Task(command));
                     System.out.println("____________________________________________________________\n " +
                             "OOPS!!! I'm sorry, I dont know what that means! :-(" +
                             "\n___________________________________________________________");
