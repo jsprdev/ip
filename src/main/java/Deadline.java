@@ -28,5 +28,10 @@ public class Deadline extends Task{
         return super.toString() + " (by: " + byTime + ")";
     }
 
+    @Override
+    public String toFileFormat() {
+        return "D|" + (isCompleted ? "1" : "0") + "|" + name + "|" + byTime;
+    }
+
 
 }

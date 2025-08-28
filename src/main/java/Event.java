@@ -37,4 +37,9 @@ public class Event extends Task{
         return super.toString() + " (from: " + start + " to: " + end + ")";
     }
 
+    @Override
+    public String toFileFormat() {
+        return "E|" + (isCompleted ? "1" : "0") + "|" + name + "|" + start + "|" + end;
+    }
+
 }

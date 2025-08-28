@@ -10,5 +10,10 @@ public class ToDo extends Task {
         return "T";
     };
 
+    @Override
+    public String toFileFormat() {
+        return "T|" + (isCompleted ? "1" : "0") + "|" + name;
+    }
+
 
 }
