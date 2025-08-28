@@ -32,7 +32,8 @@ public class Task {
     /**
      * Sets the name field of the task.
      *
-     * @param name the name to set for the task.
+     *
+     * @param name the name to set for task.
      *
      */
     public void setName(String name) {
