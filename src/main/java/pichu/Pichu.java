@@ -10,6 +10,7 @@ import pichu.task.Deadline;
 import pichu.task.Event;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public class Pichu {
     private Storage storage;
@@ -68,6 +69,10 @@ public class Pichu {
 
                 case DELETE:
                     handleDeleteCommand(fullCommand);
+                    break;
+
+                case FIND:
+                    handleFindCommand(fullCommand);
                     break;
 
                 default:
@@ -161,6 +166,16 @@ public class Pichu {
             ui.showError("Invalid task number format.");
         } catch (IndexOutOfBoundsException e) {
             ui.showError("Task number is out of range.");
+        }
+    }
+
+    private void handleFindCommand(String fullCommand) {
+        try {
+            String keyword = Parser.parseFindKeyword(fullCommand);
+            ArrayList<Task> foundTasks = taskList.findTasks(keyword);
+            ui.showFindResults(foundTasks);
+        } catch (IllegalArgumentException e) {
+            ui.showError(e.getMessage());
         }
     }
 
