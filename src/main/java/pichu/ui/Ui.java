@@ -129,6 +129,27 @@ public class Ui {
     }
 
     /**
+     * Shows the search results for the find command.
+     *
+     * @param matchingTasks the list of tasks that match the search keyword
+     */
+    public void showFindResults(ArrayList<Task> matchingTasks) {
+        System.out.println("""
+                ____________________________________________________________
+                Here are the matching tasks in your list:""");
+
+        if (matchingTasks.isEmpty()) {
+            System.out.println(" No matching tasks found.");
+        } else {
+            for (int i = 0; i < matchingTasks.size(); i++) {
+                Task temp = matchingTasks.get(i);
+                System.out.println(" " + (i + 1) + "." + "[" + temp.getType() + "]" + temp.toString());
+            }
+        }
+        System.out.println("____________________________________________________________");
+    }
+
+    /**
      * Gets time information for a task if applicable.
      *
      * @param task the task to get time info for
