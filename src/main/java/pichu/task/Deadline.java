@@ -43,10 +43,23 @@ public class Deadline extends Task{
         return null;
     }
 
+    /**
+     * Returns the deadline field of the task.
+     *
+     * @return deadline of the task.
+     *
+     */
     public LocalDateTime getDeadline() {
         return deadline;
     }
 
+    /**
+     * Returns the deadline in a user-friendly formatted string.
+     * If parsing failed, returns the original input string.
+     *
+     * @return formatted deadline string or original input if parsing failed.
+     *
+     */
     public String getFormattedDeadline() {
         if (deadline != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy, h:mm a");

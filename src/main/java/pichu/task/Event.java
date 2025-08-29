@@ -47,14 +47,32 @@ public class Event extends Task{
         return null;
     }
 
+    /**
+     * Returns the startDateTime field of the task.
+     *
+     * @return start date and time of the event.
+     *
+     */
     public LocalDateTime getStartDateTime() {
         return startDateTime;
     }
 
+    /**
+     * Returns the endDateTime field of the task.
+     *
+     * @return end date and time of the event.
+     *
+     */
     public LocalDateTime getEndDateTime() {
         return endDateTime;
     }
 
+    /**
+     * Returns the formatted start date and time of the event.
+     *
+     * @return formatted start date and time string.
+     *
+     */
     public String getFormattedStart() {
         if (startDateTime != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy, h:mm a");
@@ -63,6 +81,12 @@ public class Event extends Task{
         return originalStartInput; // Fallback to original input if parsing failed
     }
 
+    /**
+     * Returns the formatted end date and time of the event.
+     *
+     * @return formatted end date and time string.
+     *
+     */
     public String getFormattedEnd() {
         if (endDateTime != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy, h:mm a");
