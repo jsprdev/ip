@@ -1,220 +1,160 @@
-import main.java.*;
+package main.java;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class Pichu {
-    public static void main(String[] args) {
-        String name = "Pichu";
+    private Storage storage;
+    private TaskList taskList;
+    private Ui ui;
 
-        System.out.println("____________________________________________________________\n" +
-                " Hello! I'm " + name + "\n" +
-                " What can I do for you?\n" +
-                "____________________________________________________________\n"
-                );
+    public Pichu(String filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
+        taskList = new TaskList();
 
-        ArrayList<Task> cache = new ArrayList<>();
-        Scanner input = new Scanner(System.in);
-        boolean saidBye = false;
-        Storage storage = new Storage("data/tasks.txt");
-
-
-        // Loading tasks from ./data/tasks.txt
+        // Load existing tasks
         List<String> savedTasks = storage.loadTasks();
-        for (String taskData : savedTasks) {
+        taskList.loadTasks(savedTasks);
+    }
 
-            Task task = parseTaskFromString(taskData);
-            if (task != null) {
-                cache.add(task);
-            }
-        }
+    public void run() {
+        ui.showWelcome();
 
-        while (!saidBye) {
-            String command = input.nextLine();
+        boolean isExit = false;
+        while (!isExit) {
+            try {
+                String fullCommand = ui.readCommand();
+                Parser.CommandType commandType = Parser.getCommandType(fullCommand);
 
-            if (command.toLowerCase().startsWith("mark")) {
-                int index = Integer.parseInt(command.substring(5));
-                cache.get(index - 1).setCompleted(true);
-                storage.saveAllTasks(cache);
-                System.out.println("""
-                    ____________________________________________________________
-                    Nice! I've marked this task as done:
-                    """ +
-                        "[X] " + cache.get(index - 1).getName() +
-                        "\n___________________________________________________________");
-                continue;
-            } else if (command.toLowerCase().startsWith("unmark")) {
-                int index = Integer.parseInt(command.substring(7));
-                cache.get(index - 1).setCompleted(false);
-                storage.saveAllTasks(cache);
-                System.out.println("""
-                    ____________________________________________________________
-                    OK, I've marked this taks as not done yet:
-                    """ +
-                        "[ ] " + cache.get(index - 1).getName() +
-                        "\n___________________________________________________________");
-                continue;
-            } else if (command.toLowerCase().startsWith("todo")) {
-                if (command.length() <= 4 || command.substring(5).isEmpty()) {
-                    System.out.println("""
-                            ____________________________________________________________
-                             OOPS!!! The description of a todo cannot be empty.
-                            ___________________________________________________________""");
+                switch (commandType) {
+                    case BYE:
+                        isExit = true;
+                        ui.showGoodbye();
+                        break;
+
+                    case LIST:
+                        ui.showTaskList(taskList.getTasks());
+                        break;
+
+                    case MARK:
+                        handleMarkCommand(fullCommand);
+                        break;
+
+                    case UNMARK:
+                        handleUnmarkCommand(fullCommand);
+                        break;
+
+                    case TODO:
+                        handleTodoCommand(fullCommand);
+                        break;
+
+                    case DEADLINE:
+                        handleDeadlineCommand(fullCommand);
+                        break;
+
+                    case EVENT:
+                        handleEventCommand(fullCommand);
+                        break;
+
+                    case DELETE:
+                        handleDeleteCommand(fullCommand);
+                        break;
+
+                    default:
+                        ui.showError("I'm sorry, I don't know what that means! :-(");
+                        break;
                 }
-                cache.add(new ToDo(command));
-                storage.saveTask(cache.get(cache.size() - 1).toFileFormat());
-
-                System.out.println("____________________________________________________________\n " +
-                        "added: " + command +
-                        "Now you have " + cache.size() + " in the list." +
-                        "\n___________________________________________________________");
-
-                continue;
-            } else if (command.toLowerCase().startsWith("deadline")) {
-                String[] parts = command.split(" ", 2);
-
-                if (parts.length == 1) {
-                    System.out.println("""
-                            ____________________________________________________________
-                             OOPS!!! The description of a deadline cannot be empty.
-                            ___________________________________________________________""");
-                    continue;
-                }
-
-                String[] descriptionAndTime = parts[1].split("/by ", 2);
-                String description = descriptionAndTime[0].trim();
-                String byTime = descriptionAndTime.length > 1 ? descriptionAndTime[1].trim() : "";
-
-                Deadline temp = new Deadline(description, byTime);
-                cache.add(temp);
-                storage.saveTask(temp.toFileFormat());
-
-                System.out.println("____________________________________________________________\n " +
-                        "Got it. I've added this task:\n " +
-                        "  [" + temp.getType() + "][" + temp.getCompletion() + "] " + description + " (by: " + temp.getFormattedDeadline() + ")\n" +
-                        "Now you have " + cache.size() + " task(s) in the list." +
-                        "\n___________________________________________________________");
-                continue;
-            } else if (command.toLowerCase().startsWith("event")) {
-
-                String[] parts = command.split(" ", 2);
-
-                if (parts.length == 1) {
-                    System.out.println("""
-                            ____________________________________________________________
-                             OOPS!!! The description of a event cannot be empty.
-                            ___________________________________________________________""");
-                    continue;
-                }
-
-                String[] descriptionAndTime = parts[1].split("/from ", 2);
-                String description = descriptionAndTime[0].trim();
-                String time = descriptionAndTime.length > 1 ? descriptionAndTime[1].trim() : "";
-
-                String[] startAndEnd = time.split("/to ", 2);
-                String start = startAndEnd[0].trim();
-                String end = startAndEnd.length > 1 ? startAndEnd[1].trim() : "";
-
-                Event temp = new Event(description, start, end);
-                cache.add(temp);
-                storage.saveTask(temp.toFileFormat());
-
-                System.out.println("____________________________________________________________\n " +
-                        "Got it. I've added this task:\n " +
-                        "  [" + temp.getType() + "][" + temp.getCompletion() + "] " + description +
-                        " (from: " + temp.getFormattedStart() + " to: " + temp.getFormattedEnd() + ")\n" +
-                        "Now you have " + cache.size() + " task(s) in the list." +
-                        "\n___________________________________________________________");
-                continue;
-            } else if (command.toLowerCase().startsWith("delete")) {
-                int index = Integer.parseInt(command.substring(7));
-                cache.remove(index - 1);
-                storage.saveAllTasks(cache);
-
-                System.out.println("""
-                    ____________________________________________________________
-                    Noted, I've removed this task!
-                    ___________________________________________________________""");
-                continue;
-            }
-
-            enum MainWord {
-                bye,
-                list
-            }
-
-            switch (command) {
-                case "bye":
-                    System.out.println("""
-                            ____________________________________________________________
-                             Bye. Hope to see you again soon!
-                            ___________________________________________________________""");
-                    saidBye = true;
-                    break;
-
-                case "list":
-                    System.out.println("""
-                            ____________________________________________________________
-                            Here are the tasks in your list:
-                            """);
-                    for (int i = 0; i < cache.size(); i++) {
-                        Task temp = cache.get(i);
-                        System.out.println((i + 1) + "." + "[" + temp.getType() + "]" + temp.toString());
-                    }
-                    System.out.println("\n___________________________________________________________");
-                    break;
-
-
-                default:
-                    System.out.println("____________________________________________________________\n " +
-                            "OOPS!!! I'm sorry, I dont know what that means! :-(" +
-                            "\n___________________________________________________________");
-                    break;
+            } catch (Exception e) {
+                ui.showError(e.getMessage());
             }
         }
     }
 
-    private static Task parseTaskFromString(String taskData) {
-        if (taskData == null || taskData.trim().isEmpty()) {
-            return null;
+    private void handleMarkCommand(String fullCommand) {
+        try {
+            int index = Parser.parseIndex(fullCommand);
+            taskList.markTask(index);
+            Task task = taskList.getTask(index);
+            ui.showTaskMarked(task);
+            storage.saveAllTasks(taskList.getTasks());
+        } catch (NumberFormatException e) {
+            ui.showError("Invalid task number format.");
+        } catch (IndexOutOfBoundsException e) {
+            ui.showError("Task number is out of range.");
         }
+    }
 
-        String[] parts = taskData.split("\\|");
-        if (parts.length < 3) {
-            return null;
+    private void handleUnmarkCommand(String fullCommand) {
+        try {
+            int index = Parser.parseIndex(fullCommand);
+            taskList.unmarkTask(index);
+            Task task = taskList.getTask(index);
+            ui.showTaskUnmarked(task);
+            storage.saveAllTasks(taskList.getTasks());
+        } catch (NumberFormatException e) {
+            ui.showError("Invalid task number format.");
+        } catch (IndexOutOfBoundsException e) {
+            ui.showError("Task number is out of range.");
         }
+    }
 
-        String type = parts[0];
-        boolean isCompleted = parts[1].equals("1");
-        String description = parts[2];
-
-        Task task = null;
-
-        switch (type) {
-            case "T":
-                task = new ToDo(description);
-                break;
-            case "D":
-                if (parts.length >= 4) {
-                    task = new Deadline(description, parts[3]);
-                }
-                break;
-            case "E":
-                if (parts.length >= 5) {
-                    task = new Event(description, parts[3], parts[4]);
-                }
-                break;
+    private void handleTodoCommand(String fullCommand) {
+        try {
+            String description = Parser.parseTodoDescription(fullCommand);
+            Task newTask = new ToDo(description);
+            taskList.addTask(newTask);
+            ui.showTaskAdded(newTask, taskList.size());
+            storage.saveTask(newTask.toFileFormat());
+        } catch (IllegalArgumentException e) {
+            ui.showError(e.getMessage());
         }
+    }
 
-        if (task != null) {
-            task.setCompleted(isCompleted);
+    private void handleDeadlineCommand(String fullCommand) {
+        try {
+            String[] parsed = Parser.parseDeadlineCommand(fullCommand);
+            String description = parsed[0];
+            String deadline = parsed[1];
+
+            Task newTask = new Deadline(description, deadline);
+            taskList.addTask(newTask);
+            ui.showTaskAdded(newTask, taskList.size());
+            storage.saveTask(newTask.toFileFormat());
+        } catch (IllegalArgumentException e) {
+            ui.showError(e.getMessage());
         }
+    }
 
-        return task;
+    private void handleEventCommand(String fullCommand) {
+        try {
+            String[] parsed = Parser.parseEventCommand(fullCommand);
+            String description = parsed[0];
+            String start = parsed[1];
+            String end = parsed[2];
+
+            Task newTask = new Event(description, start, end);
+            taskList.addTask(newTask);
+            ui.showTaskAdded(newTask, taskList.size());
+            storage.saveTask(newTask.toFileFormat());
+        } catch (IllegalArgumentException e) {
+            ui.showError(e.getMessage());
+        }
+    }
+
+    private void handleDeleteCommand(String fullCommand) {
+        try {
+            int index = Parser.parseIndex(fullCommand);
+            taskList.deleteTask(index);
+            ui.showTaskDeleted();
+            storage.saveAllTasks(taskList.getTasks());
+        } catch (NumberFormatException e) {
+            ui.showError("Invalid task number format.");
+        } catch (IndexOutOfBoundsException e) {
+            ui.showError("Task number is out of range.");
+        }
+    }
+
+    public static void main(String[] args) {
+        new Pichu("data/tasks.txt").run();
     }
 }
