@@ -37,42 +37,42 @@ public class Pichu {
                 Parser.CommandType commandType = Parser.getCommandType(fullCommand);
 
                 switch (commandType) {
-                    case BYE:
-                        isExit = true;
-                        ui.showGoodbye();
-                        break;
+                case BYE:
+                    isExit = true;
+                    ui.showGoodbye();
+                    break;
 
-                    case LIST:
-                        ui.showTaskList(taskList.getTasks());
-                        break;
+                case LIST:
+                    ui.showTaskList(taskList.getTasks());
+                    break;
 
-                    case MARK:
-                        handleMarkCommand(fullCommand);
-                        break;
+                case MARK:
+                    handleMarkCommand(fullCommand);
+                    break;
 
-                    case UNMARK:
-                        handleUnmarkCommand(fullCommand);
-                        break;
+                case UNMARK:
+                    handleUnmarkCommand(fullCommand);
+                    break;
 
-                    case TODO:
-                        handleTodoCommand(fullCommand);
-                        break;
+                case TODO:
+                    handleTodoCommand(fullCommand);
+                    break;
 
-                    case DEADLINE:
-                        handleDeadlineCommand(fullCommand);
-                        break;
+                case DEADLINE:
+                    handleDeadlineCommand(fullCommand);
+                    break;
 
-                    case EVENT:
-                        handleEventCommand(fullCommand);
-                        break;
+                case EVENT:
+                    handleEventCommand(fullCommand);
+                    break;
 
-                    case DELETE:
-                        handleDeleteCommand(fullCommand);
-                        break;
+                case DELETE:
+                    handleDeleteCommand(fullCommand);
+                    break;
 
-                    default:
-                        ui.showError("I'm sorry, I don't know what that means! :-(");
-                        break;
+                default:
+                    ui.showError("I'm sorry, I don't know what that means! :-(");
+                    break;
                 }
             } catch (Exception e) {
                 ui.showError(e.getMessage());
