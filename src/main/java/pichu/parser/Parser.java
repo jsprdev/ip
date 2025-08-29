@@ -1,4 +1,9 @@
-package main.java;
+package pichu.parser;
+
+import pichu.task.Task;
+import pichu.task.ToDo;
+import pichu.task.Deadline;
+import pichu.task.Event;
 
 /**
  * Deals with making sense of the user command.

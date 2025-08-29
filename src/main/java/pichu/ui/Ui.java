@@ -1,4 +1,8 @@
-package main.java;
+package pichu.ui;
+
+import pichu.task.Task;
+import pichu.task.Deadline;
+import pichu.task.Event;
 
 import java.util.ArrayList;
 import java.util.Scanner;

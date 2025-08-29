@@ -1,4 +1,7 @@
-package main.java;
+package pichu.core;
+
+import pichu.task.Task;
+import pichu.parser.Parser;
 
 import java.util.ArrayList;
 import java.util.List;
