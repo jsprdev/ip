@@ -1,4 +1,13 @@
-package main.java;
+package pichu;
+
+import pichu.storage.Storage;
+import pichu.core.TaskList;
+import pichu.ui.Ui;
+import pichu.parser.Parser;
+import pichu.task.Task;
+import pichu.task.ToDo;
+import pichu.task.Deadline;
+import pichu.task.Event;
 
 import java.util.List;
 

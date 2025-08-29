@@ -1,4 +1,6 @@
-package main.java;
+package pichu.storage;
+
+import pichu.task.Task;
 
 import java.io.*;
 import java.nio.file.*;

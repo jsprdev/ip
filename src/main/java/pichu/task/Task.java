@@ -1,4 +1,4 @@
-package main.java;
+package pichu.task;
 
 public class Task {
     String name;
@@ -78,6 +78,7 @@ public class Task {
         }
         return " ";
     }
+
 
     /**
      * Returns the file formatted string of the task.

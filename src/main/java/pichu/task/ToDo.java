@@ -1,4 +1,4 @@
-package main.java;
+package pichu.task;
 
 public class ToDo extends Task {
     public ToDo(String name) {
