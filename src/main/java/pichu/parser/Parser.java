@@ -11,7 +11,7 @@ import pichu.task.Event;
 public class Parser {
 
     public enum CommandType {
-        BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, UNKNOWN
+        BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, FIND, UNKNOWN
     }
 
     /**
@@ -43,6 +43,8 @@ public class Parser {
             return CommandType.EVENT;
         } else if (command.startsWith("delete ")) {
             return CommandType.DELETE;
+        } else if (command.startsWith("find ")) {
+            return CommandType.FIND;
         } else {
             return CommandType.UNKNOWN;
         }
@@ -129,6 +131,20 @@ public class Parser {
         }
 
         return new String[]{description, start, end};
+    }
+
+    /**
+     * Parses a find command to extract the search keyword.
+     *
+     * @param input the user's input command
+     * @return the search keyword
+     * @throws IllegalArgumentException if the keyword is empty
+     */
+    public static String parseFindKeyword(String input) throws IllegalArgumentException {
+        if (input.length() <= 4 || input.substring(5).trim().isEmpty()) {
+            throw new IllegalArgumentException("The search keyword cannot be empty.");
+        }
+        return input.substring(5).trim();
     }
 
     /**
