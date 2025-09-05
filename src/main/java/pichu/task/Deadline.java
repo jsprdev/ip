@@ -4,11 +4,19 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-public class Deadline extends Task{
+/**
+ * Represents a Deadline task with a due date.
+ */
+public class Deadline extends Task {
 
     private LocalDateTime deadline;
     private String originalInput;
 
+    /**
+     * Constructor for Deadline task.
+     * @param name the task description
+     * @param dateTimeInput the deadline date/time
+     */
     public Deadline(String name, String dateTimeInput) {
         super(name);
         this.originalInput = dateTimeInput;
@@ -22,12 +30,12 @@ public class Deadline extends Task{
 
         // Try different date formats
         String[] formats = {
-            "yyyy-MM-dd HHmm",     // 2019-12-02 1800
-            "yyyy-MM-dd",          // 2019-12-02
-            "d/M/yyyy HHmm",       // 2/12/2019 1800
-            "d/M/yyyy",            // 2/12/2019
-            "dd/MM/yyyy HHmm",     // 02/12/2019 1800
-            "dd/MM/yyyy"           // 02/12/2019
+                "yyyy-MM-dd HHmm", // 2019-12-02 1800
+                "yyyy-MM-dd", // 2019-12-02
+                "d/M/yyyy HHmm", // 2/12/2019 1800
+                "d/M/yyyy", // 2/12/2019
+                "dd/MM/yyyy HHmm", // 02/12/2019 1800
+                "dd/MM/yyyy" // 02/12/2019
         };
 
         for (String format : formats) {
@@ -80,6 +88,6 @@ public class Deadline extends Task{
 
     @Override
     public String toFileFormat() {
-        return "D|" + (isCompleted ? "1" : "0") + "|" + name + "|" + originalInput;
+        return "D|" + (isCompleted() ? "1" : "0") + "|" + getName() + "|" + originalInput;
     }
 }

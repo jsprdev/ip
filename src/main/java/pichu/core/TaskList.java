@@ -1,10 +1,10 @@
 package pichu.core;
 
-import pichu.task.Task;
-import pichu.parser.Parser;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import pichu.parser.Parser;
+import pichu.task.Task;
 
 /**
  * Contains the task list and operations to add/delete tasks in the list.

@@ -1,11 +1,11 @@
 package pichu.ui;
 
-import pichu.task.Task;
-import pichu.task.Deadline;
-import pichu.task.Event;
-
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import pichu.task.Deadline;
+import pichu.task.Event;
+import pichu.task.Task;
 
 /**
  * Handles interactions with the user.
@@ -22,10 +22,10 @@ public class Ui {
      */
     public void showWelcome() {
         String name = "Pichu";
-        System.out.println("____________________________________________________________\n" +
-                " Hello! I'm " + name + "\n" +
-                " What can I do for you?\n" +
-                "____________________________________________________________\n");
+        System.out.println("____________________________________________________________\n"
+                + " Hello! I'm " + name + "\n"
+                + " What can I do for you?\n"
+                + "____________________________________________________________\n");
     }
 
     /**
@@ -64,9 +64,9 @@ public class Ui {
      * @param message the error message to display
      */
     public void showError(String message) {
-        System.out.println("____________________________________________________________\n " +
-                "OOPS!!! " + message +
-                "\n___________________________________________________________");
+        System.out.println("____________________________________________________________\n "
+                + "OOPS!!! " + message
+                + "\n___________________________________________________________");
     }
 
     /**
@@ -78,9 +78,9 @@ public class Ui {
         System.out.println("""
                 ____________________________________________________________
                 Nice! I've marked this task as done:
-                """ +
-                "[X] " + task.getName() +
-                "\n___________________________________________________________");
+                """
+                + "[X] " + task.getName()
+                + "\n___________________________________________________________");
     }
 
     /**
@@ -92,9 +92,9 @@ public class Ui {
         System.out.println("""
                 ____________________________________________________________
                 OK, I've marked this task as not done yet:
-                """ +
-                "[ ] " + task.getName() +
-                "\n___________________________________________________________");
+                """
+                + "[ ] " + task.getName()
+                + "\n___________________________________________________________");
     }
 
     /**
@@ -104,12 +104,12 @@ public class Ui {
      * @param totalTasks the total number of tasks after addition
      */
     public void showTaskAdded(Task task, int totalTasks) {
-        System.out.println("____________________________________________________________\n " +
-                "Got it. I've added this task:\n " +
-                "  [" + task.getType() + "][" + task.getCompletion() + "] " + task.getName() +
-                getTaskTimeInfo(task) + "\n" +
-                "Now you have " + totalTasks + " task(s) in the list." +
-                "\n___________________________________________________________");
+        System.out.println("____________________________________________________________\n "
+                + "Got it. I've added this task:\n "
+                + "  [" + task.getType() + "][" + task.getCompletion() + "] " + task.getName()
+                + getTaskTimeInfo(task) + "\n"
+                + "Now you have " + totalTasks + " task(s) in the list."
+                + "\n___________________________________________________________");
     }
 
     /**
