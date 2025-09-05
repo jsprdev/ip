@@ -1,15 +1,18 @@
 package pichu.parser;
 
-import pichu.task.Task;
-import pichu.task.ToDo;
 import pichu.task.Deadline;
 import pichu.task.Event;
+import pichu.task.Task;
+import pichu.task.ToDo;
 
 /**
  * Deals with making sense of the user command.
  */
 public class Parser {
 
+    /**
+     * Enum representing different command types.
+     */
     public enum CommandType {
         BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, FIND, UNKNOWN
     }
@@ -170,19 +173,21 @@ public class Parser {
         Task task = null;
 
         switch (type) {
-            case "T":
-                task = new ToDo(description);
-                break;
-            case "D":
-                if (parts.length >= 4) {
-                    task = new Deadline(description, parts[3]);
-                }
-                break;
-            case "E":
-                if (parts.length >= 5) {
-                    task = new Event(description, parts[3], parts[4]);
-                }
-                break;
+        case "T":
+            task = new ToDo(description);
+            break;
+        case "D":
+            if (parts.length >= 4) {
+                task = new Deadline(description, parts[3]);
+            }
+            break;
+        case "E":
+            if (parts.length >= 5) {
+                task = new Event(description, parts[3], parts[4]);
+            }
+            break;
+        default:
+            break;
         }
 
         if (task != null) {

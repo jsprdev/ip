@@ -1,15 +1,25 @@
 package pichu.storage;
 
-import pichu.task.Task;
-
-import java.io.*;
-import java.nio.file.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
+import pichu.task.Task;
+
+/**
+ * Handles loading and saving of tasks to and from storage file.
+ */
 public final class Storage {
     private final Path dataPath;
 
+    /**
+     * Constructor for Storage class.
+     * @param filePath the path to the storage file
+     */
     public Storage(String filePath) {
         this.dataPath = Paths.get(filePath);
         createFileIfNotExists();
@@ -32,7 +42,7 @@ public final class Storage {
      * @param taskData The string representation of the task to be saved.
      *
      */
-    public void saveTask(String taskData){
+    public void saveTask(String taskData) {
         try {
             Files.write(dataPath, (taskData + System.lineSeparator()).getBytes(),
                     StandardOpenOption.CREATE, StandardOpenOption.APPEND);

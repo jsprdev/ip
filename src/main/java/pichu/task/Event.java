@@ -4,13 +4,22 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-public class Event extends Task{
+/**
+ * Represents an Event task with start and end times.
+ */
+public class Event extends Task {
 
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
     private String originalStartInput;
     private String originalEndInput;
 
+    /**
+     * Constructor for Event task.
+     * @param name the task description
+     * @param startInput the start date/time
+     * @param endInput the end date/time
+     */
     public Event(String name, String startInput, String endInput) {
         super(name);
         this.originalStartInput = startInput;
@@ -26,12 +35,12 @@ public class Event extends Task{
 
         // Try different date formats
         String[] formats = {
-            "yyyy-MM-dd HHmm",     // 2019-12-02 1800
-            "yyyy-MM-dd",          // 2019-12-02
-            "d/M/yyyy HHmm",       // 2/12/2019 1800
-            "d/M/yyyy",            // 2/12/2019
-            "dd/MM/yyyy HHmm",     // 02/12/2019 1800
-            "dd/MM/yyyy"           // 02/12/2019
+                "yyyy-MM-dd HHmm", // 2019-12-02 1800
+                "yyyy-MM-dd", // 2019-12-02
+                "d/M/yyyy HHmm", // 2/12/2019 1800
+                "d/M/yyyy", // 2/12/2019
+                "dd/MM/yyyy HHmm", // 02/12/2019 1800
+                "dd/MM/yyyy" // 02/12/2019
         };
 
         for (String format : formats) {
@@ -107,6 +116,6 @@ public class Event extends Task{
 
     @Override
     public String toFileFormat() {
-        return "E|" + (isCompleted ? "1" : "0") + "|" + name + "|" + originalStartInput + "|" + originalEndInput;
+        return "E|" + (isCompleted() ? "1" : "0") + "|" + getName() + "|" + originalStartInput + "|" + originalEndInput;
     }
 }

@@ -1,22 +1,29 @@
 package pichu;
 
-import pichu.storage.Storage;
+import java.util.ArrayList;
+import java.util.List;
+
 import pichu.core.TaskList;
-import pichu.ui.Ui;
 import pichu.parser.Parser;
-import pichu.task.Task;
-import pichu.task.ToDo;
+import pichu.storage.Storage;
 import pichu.task.Deadline;
 import pichu.task.Event;
+import pichu.task.Task;
+import pichu.task.ToDo;
+import pichu.ui.Ui;
 
-import java.util.List;
-import java.util.ArrayList;
-
+/**
+ * Main class for the Pichu chatbot application.
+ */
 public class Pichu {
     private Storage storage;
     private TaskList taskList;
     private Ui ui;
 
+    /**
+     * Constructor for Pichu chatbot.
+     * @param filePath the file path for task storage
+     */
     public Pichu(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
@@ -27,6 +34,9 @@ public class Pichu {
         taskList.loadTasks(savedTasks);
     }
 
+    /**
+     * Main run method to start the chatbot.
+     */
     public void run() {
         ui.showWelcome();
 
