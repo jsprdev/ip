@@ -44,7 +44,18 @@ public class Ui {
      * @return the user's command as a String
      */
     public String readCommand() {
-        return scanner.nextLine();
+        try {
+            if (scanner.hasNextLine()) {
+                return scanner.nextLine();
+            } else {
+                // No more input available, signal to exit
+                return "bye";
+            }
+        } catch (Exception e) {
+            // If there's an issue reading input, signal to exit
+            System.out.println("No input available. Exiting...");
+            return "bye";
+        }
     }
 
     /**
