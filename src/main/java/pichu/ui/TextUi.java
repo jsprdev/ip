@@ -10,10 +10,10 @@ import pichu.task.Task;
 /**
  * Handles interactions with the user.
  */
-public class Ui {
+public class TextUi {
     private Scanner scanner;
 
-    public Ui() {
+    public TextUi() {
         this.scanner = new Scanner(System.in);
     }
 

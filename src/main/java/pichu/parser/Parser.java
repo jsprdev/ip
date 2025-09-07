@@ -3,7 +3,7 @@ package pichu.parser;
 import pichu.task.Deadline;
 import pichu.task.Event;
 import pichu.task.Task;
-import pichu.task.ToDo;
+import pichu.task.Todo;
 
 /**
  * Deals with making sense of the user command.
@@ -174,7 +174,7 @@ public class Parser {
 
         switch (type) {
         case "T":
-            task = new ToDo(description);
+            task = new Todo(description);
             break;
         case "D":
             if (parts.length >= 4) {

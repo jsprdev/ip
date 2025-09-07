@@ -1,0 +1,106 @@
+// Groovy
+plugins {
+    id 'java'
+    id 'application'
+    id 'checkstyle'
+}
+
+// Global JVM settings for all Gradle tasks
+tasks.withType(JavaCompile) {
+    options.fork = true
+    options.forkOptions.jvmArgs = ['-Xmx2g', '-Xms512m']
+}
+
+tasks.withType(Test) {
+    jvmArgs = ['-Xmx1g', '-Xms512m']
+}
+
+//checkstyle {
+//    toolVersion = '11.0.0'
+//}
+
+checkstyle {
+    toolVersion = '11.0.0'
+    ignoreFailures = true
+    maxWarnings = 0
+    maxErrors = 0
+}
+
+// Configure checkstyle tasks to not fail the build
+tasks.withType(Checkstyle) {
+    ignoreFailures = true
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    String javaFxVersion = '17.0.7'
+
+    implementation group: 'org.openjfx', name: 'javafx-base', version: javaFxVersion, classifier: 'win'
+    implementation group: 'org.openjfx', name: 'javafx-base', version: javaFxVersion, classifier: 'mac'
+    implementation group: 'org.openjfx', name: 'javafx-base', version: javaFxVersion, classifier: 'linux'
+    implementation group: 'org.openjfx', name: 'javafx-controls', version: javaFxVersion, classifier: 'win'
+    implementation group: 'org.openjfx', name: 'javafx-controls', version: javaFxVersion, classifier: 'mac'
+    implementation group: 'org.openjfx', name: 'javafx-controls', version: javaFxVersion, classifier: 'linux'
+    implementation group: 'org.openjfx', name: 'javafx-fxml', version: javaFxVersion, classifier: 'win'
+    implementation group: 'org.openjfx', name: 'javafx-fxml', version: javaFxVersion, classifier: 'mac'
+    implementation group: 'org.openjfx', name: 'javafx-fxml', version: javaFxVersion, classifier: 'linux'
+    implementation group: 'org.openjfx', name: 'javafx-graphics', version: javaFxVersion, classifier: 'win'
+    implementation group: 'org.openjfx', name: 'javafx-graphics', version: javaFxVersion, classifier: 'mac'
+    implementation group: 'org.openjfx', name: 'javafx-graphics', version: javaFxVersion, classifier: 'linux'
+}
+
+
+test {
+    useJUnitPlatform()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['src/test/java']
+        }
+    }
+}
+
+//application {
+//    mainClass = 'pichu.Pichu'
+//}
+
+application {
+    mainClass.set("Launcher")
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'pichu.Pichu'
+    }
+}
+
+tasks.named('run') {
+    standardInput = System.in
+    jvmArgs = [
+            '-Xms512m',
+            '-Xmx1g',
+            '-XX:+HeapDumpOnOutOfMemoryError',
+            '-XX:HeapDumpPath=./heapdump.hprof'
+    ]
+}
