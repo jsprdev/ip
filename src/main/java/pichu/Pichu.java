@@ -1,5 +1,10 @@
 package pichu;
 
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.stage.Stage;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,8 +14,8 @@ import pichu.storage.Storage;
 import pichu.task.Deadline;
 import pichu.task.Event;
 import pichu.task.Task;
-import pichu.task.ToDo;
-import pichu.ui.Ui;
+import pichu.task.Todo;
+import pichu.ui.TextUi;
 
 /**
  * Main class for the Pichu chatbot application.
@@ -18,14 +23,14 @@ import pichu.ui.Ui;
 public class Pichu {
     private Storage storage;
     private TaskList taskList;
-    private Ui ui;
+    private TextUi textUi;
 
     /**
      * Constructor for Pichu chatbot.
      * @param filePath the file path for task storage
      */
     public Pichu(String filePath) {
-        ui = new Ui();
+        textUi = new TextUi();
         storage = new Storage(filePath);
         taskList = new TaskList();
 
@@ -38,23 +43,23 @@ public class Pichu {
      * Main run method to start the chatbot.
      */
     public void run() {
-        ui.showWelcome();
+        textUi.showWelcome();
 
 
         boolean isExit = false;
         while (!isExit) {
             try {
-                String fullCommand = ui.readCommand();
+                String fullCommand = textUi.readCommand();
                 Parser.CommandType commandType = Parser.getCommandType(fullCommand);
 
                 switch (commandType) {
                 case BYE:
                     isExit = true;
-                    ui.showGoodbye();
+                    textUi.showGoodbye();
                     break;
 
                 case LIST:
-                    ui.showTaskList(taskList.getTasks());
+                    textUi.showTaskList(taskList.getTasks());
                     break;
 
                 case MARK:
@@ -86,11 +91,11 @@ public class Pichu {
                     break;
 
                 default:
-                    ui.showError("I'm sorry, I don't know what that means! :-(");
+                    textUi.showError("I'm sorry, I don't know what that means! :-(");
                     break;
                 }
             } catch (Exception e) {
-                ui.showError(e.getMessage());
+                textUi.showError(e.getMessage());
             }
         }
     }
@@ -100,12 +105,12 @@ public class Pichu {
             int index = Parser.parseIndex(fullCommand);
             taskList.markTask(index);
             Task task = taskList.getTask(index);
-            ui.showTaskMarked(task);
+            textUi.showTaskMarked(task);
             storage.saveAllTasks(taskList.getTasks());
         } catch (NumberFormatException e) {
-            ui.showError("Invalid task number format.");
+            textUi.showError("Invalid task number format.");
         } catch (IndexOutOfBoundsException e) {
-            ui.showError("Task number is out of range.");
+            textUi.showError("Task number is out of range.");
         }
     }
 
@@ -114,24 +119,24 @@ public class Pichu {
             int index = Parser.parseIndex(fullCommand);
             taskList.unmarkTask(index);
             Task task = taskList.getTask(index);
-            ui.showTaskUnmarked(task);
+            textUi.showTaskUnmarked(task);
             storage.saveAllTasks(taskList.getTasks());
         } catch (NumberFormatException e) {
-            ui.showError("Invalid task number format.");
+            textUi.showError("Invalid task number format.");
         } catch (IndexOutOfBoundsException e) {
-            ui.showError("Task number is out of range.");
+            textUi.showError("Task number is out of range.");
         }
     }
 
     private void handleTodoCommand(String fullCommand) {
         try {
             String description = Parser.parseTodoDescription(fullCommand);
-            Task newTask = new ToDo(description);
+            Task newTask = new Todo(description);
             taskList.addTask(newTask);
-            ui.showTaskAdded(newTask, taskList.size());
+            textUi.showTaskAdded(newTask, taskList.size());
             storage.saveTask(newTask.toFileFormat());
         } catch (IllegalArgumentException e) {
-            ui.showError(e.getMessage());
+            textUi.showError(e.getMessage());
         }
     }
 
@@ -143,10 +148,10 @@ public class Pichu {
 
             Task newTask = new Deadline(description, deadline);
             taskList.addTask(newTask);
-            ui.showTaskAdded(newTask, taskList.size());
+            textUi.showTaskAdded(newTask, taskList.size());
             storage.saveTask(newTask.toFileFormat());
         } catch (IllegalArgumentException e) {
-            ui.showError(e.getMessage());
+            textUi.showError(e.getMessage());
         }
     }
 
@@ -159,10 +164,10 @@ public class Pichu {
 
             Task newTask = new Event(description, start, end);
             taskList.addTask(newTask);
-            ui.showTaskAdded(newTask, taskList.size());
+            textUi.showTaskAdded(newTask, taskList.size());
             storage.saveTask(newTask.toFileFormat());
         } catch (IllegalArgumentException e) {
-            ui.showError(e.getMessage());
+            textUi.showError(e.getMessage());
         }
     }
 
@@ -170,12 +175,12 @@ public class Pichu {
         try {
             int index = Parser.parseIndex(fullCommand);
             taskList.deleteTask(index);
-            ui.showTaskDeleted();
+            textUi.showTaskDeleted();
             storage.saveAllTasks(taskList.getTasks());
         } catch (NumberFormatException e) {
-            ui.showError("Invalid task number format.");
+            textUi.showError("Invalid task number format.");
         } catch (IndexOutOfBoundsException e) {
-            ui.showError("Task number is out of range.");
+            textUi.showError("Task number is out of range.");
         }
     }
 
@@ -183,9 +188,9 @@ public class Pichu {
         try {
             String keyword = Parser.parseFindKeyword(fullCommand);
             ArrayList<Task> foundTasks = taskList.findTasks(keyword);
-            ui.showFindResults(foundTasks);
+            textUi.showFindResults(foundTasks);
         } catch (IllegalArgumentException e) {
-            ui.showError(e.getMessage());
+            textUi.showError(e.getMessage());
         }
     }
 
