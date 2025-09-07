@@ -5,9 +5,11 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import pichu.DialogBox;
+import pichu.Pichu;
 
 
 public class Main extends Application {
@@ -19,7 +21,8 @@ public class Main extends Application {
     private Scene scene;
 
     private Image userImage = new Image(this.getClass().getResourceAsStream("/images/Speed.png"));
-    private Image dukeImage = new Image(this.getClass().getResourceAsStream("/images/Ronaldo.png"));
+    private Image pichuImage = new Image(this.getClass().getResourceAsStream("/images/Ronaldo.png"));
+    private Pichu pichu = new Pichu();
 
 
     @Override
@@ -44,6 +47,69 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
+        //Formatting the window to look as expected
+
+        stage.setTitle("Pichu");
+        stage.setResizable(false);
+        stage.setMinHeight(600.0);
+        stage.setMinWidth(400.0);
+
+        mainLayout.setPrefSize(400.0, 600.0);
+
+        scrollPane.setPrefSize(385, 535);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+
+        scrollPane.setVvalue(1.0);
+        scrollPane.setFitToWidth(true);
+
+        dialogContainer.setPrefHeight(Region.USE_COMPUTED_SIZE);
+
+        userInput.setPrefWidth(325.0);
+
+        sendButton.setPrefWidth(55.0);
+
+        AnchorPane.setTopAnchor(scrollPane, 1.0);
+
+        AnchorPane.setBottomAnchor(sendButton, 1.0);
+        AnchorPane.setRightAnchor(sendButton, 1.0);
+
+        AnchorPane.setLeftAnchor(userInput, 1.0);
+        AnchorPane.setBottomAnchor(userInput, 1.0);
+
+        //Handling user input
+
+        sendButton.setOnMouseClicked((event) -> {
+            handleUserInput();
+        });
+        userInput.setOnAction((event) -> {
+            handleUserInput();
+        });
+
+        //Scroll down to the end every time dialogContainer's height changes.
+        dialogContainer.heightProperty().addListener((observable) -> scrollPane.setVvalue(1.0));
+
         //More code to be added here later
+
+        dialogContainer.getChildren().addAll(
+                DialogBox.getDukeDialog("Hello! I'm Pichu\nWhat can I do for you?", pichuImage)
+        );
+
+
     }
+
+    /**
+     * Creates a dialog box containing user input, and appends it to
+     * the dialog container. Clears the user input after processing.
+     */
+    private void handleUserInput() {
+        String userText = userInput.getText();
+        String pichuText = pichu.getResponse(userInput.getText());
+        dialogContainer.getChildren().addAll(
+                DialogBox.getUserDialog(userText, userImage),
+                DialogBox.getDukeDialog(pichuText, pichuImage)
+        );
+        userInput.clear();
+    }
+
 }
