@@ -4,6 +4,11 @@ package pichu.task;
  * Represents a task with a name and completion status.
  */
 public class Task {
+    protected static final String COMPLETED_STATUS_FILE = "1";
+    protected static final String INCOMPLETE_STATUS_FILE = "0";
+    protected static final String COMPLETED_SYMBOL = "X";
+    protected static final String INCOMPLETE_SYMBOL = " ";
+
     private String name;
     private boolean isCompleted = false;
 
@@ -30,15 +35,6 @@ public class Task {
     }
 
     /**
-     * Sets the name field of the task.
-     *
-     * @param name the name to set for task.
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
      * Sets the isCompleted field of the task.
      *
      * @param completed the status of completion of the task.
@@ -52,7 +48,6 @@ public class Task {
         return (isCompleted ? "[X]" : "[ ]") + " " + name;
     }
 
-
     /**
      * Returns the type of the task in terms of a single letter.
      *
@@ -60,20 +55,16 @@ public class Task {
      */
     public String getType() {
         return "-";
-    };
-
-    /**
-     * Returns the type of the task in terms of a single letter.
-     *
-     * @return a single-letter string representing the type of the task.
-     */
-    public String getCompletion() {
-        if (isCompleted) {
-            return "X";
-        }
-        return " ";
     }
 
+    /**
+     * Returns the completion status symbol.
+     *
+     * @return a single-letter string representing the completion status.
+     */
+    public String getCompletion() {
+        return isCompleted ? COMPLETED_SYMBOL : INCOMPLETE_SYMBOL;
+    }
 
     /**
      * Returns the file formatted string of the task.
@@ -81,7 +72,7 @@ public class Task {
      * @return a string representing the file-formatted task.
      */
     public String toFileFormat() {
-        return "T|" + (isCompleted ? "1" : "0") + "|" + name;
+        String completionStatus = isCompleted ? COMPLETED_STATUS_FILE : INCOMPLETE_STATUS_FILE;
+        return "T|" + completionStatus + "|" + name;
     }
-
 }
