@@ -14,18 +14,21 @@ import pichu.task.Todo;
 /**
  * Main class for the Pichu chatbot application.
  */
+
+// AI USAGE! for A-AiAssisted
+// Used GitHub Copilot to assist in writing methods that handle user commands and adding personality for A-Personality
 public class Pichu {
     private static final String DEFAULT_FILE_PATH = "data/tasks.txt";
-    private static final String EMPTY_COMMAND_MESSAGE = "Please enter a command!";
-    private static final String UNKNOWN_COMMAND_MESSAGE = "I'm sorry, I don't know what that means! :-(";
-    private static final String GOODBYE_MESSAGE = "Bye. Hope to see you again soon!";
-    private static final String EMPTY_TASK_LIST_MESSAGE = "Your task list is empty!";
-    private static final String TASK_LIST_HEADER = "Here are the tasks in your list:\n";
-    private static final String MATCHING_TASKS_HEADER = "Here are the matching tasks in your list:\n";
-    private static final String NO_MATCHES_MESSAGE = "No matching tasks found.";
-    private static final String INVALID_NUMBER_MESSAGE = "OOPS!!! Invalid task number format.";
-    private static final String INDEX_OUT_OF_RANGE_MESSAGE = "OOPS!!! Task number is out of range.";
-    private static final String ERROR_PREFIX = "OOPS!!! ";
+    private static final String EMPTY_COMMAND_MESSAGE = "SEWY... Please enter a command!";
+    private static final String UNKNOWN_COMMAND_MESSAGE = "SEWY... I'm sorry, I don't know what that means! :-(";
+    private static final String GOODBYE_MESSAGE = "SUIII! Bye. Hope to see you again soon!";
+    private static final String EMPTY_TASK_LIST_MESSAGE = "SEWY... Your task list is empty!";
+    private static final String TASK_LIST_HEADER = "SUIII! Here are the tasks in your list:\n";
+    private static final String MATCHING_TASKS_HEADER = "SUIII! Here are the matching tasks in your list:\n";
+    private static final String NO_MATCHES_MESSAGE = "SEWY... No matching tasks found.";
+    private static final String INVALID_NUMBER_MESSAGE = "SEWY... Invalid task number format.";
+    private static final String INDEX_OUT_OF_RANGE_MESSAGE = "SEWY... Task number is out of range.";
+    private static final String ERROR_PREFIX = "SEWY... ";
 
     private final Storage storage;
     private final TaskList taskList;
@@ -130,7 +133,7 @@ public class Pichu {
             taskList.markTask(index);
             Task task = taskList.getTask(index);
             storage.saveAllTasks(taskList.getTasks());
-            return "Nice! I've marked this task as done:\n[X] " + task.getName();
+            return "SUIIIII! I've marked this task as done:\n[X] " + task.getName();
         });
     }
 
@@ -139,7 +142,7 @@ public class Pichu {
             taskList.unmarkTask(index);
             Task task = taskList.getTask(index);
             storage.saveAllTasks(taskList.getTasks());
-            return "OK, I've marked this task as not done yet:\n[ ] " + task.getName();
+            return "SEWY...,I've marked this task as not done yet:\n[ ] " + task.getName();
         });
     }
 
@@ -184,7 +187,7 @@ public class Pichu {
             Task taskToDelete = taskList.getTask(index);
             taskList.deleteTask(index);
             storage.saveAllTasks(taskList.getTasks());
-            return "Noted. I've removed this task:\n  [" + taskToDelete.getType() + "][" + taskToDelete.getCompletion() + "] " + taskToDelete.getName() + "\nNow you have " + taskList.size() + " task(s) in the list.";
+            return "SUIIII. I've removed this task:\n  [" + taskToDelete.getType() + "][" + taskToDelete.getCompletion() + "] " + taskToDelete.getName() + "\nNow you have " + taskList.size() + " task(s) in the list.";
         });
     }
 
@@ -200,7 +203,7 @@ public class Pichu {
 
     private String formatTagResults(ArrayList<Task> foundTasks, String tag) {
         if (foundTasks.isEmpty()) {
-            return "No tasks found with tag #" + tag + ".";
+            return "SEWY...No tasks found with tag #" + tag + ".";
         }
 
         StringBuilder sb = new StringBuilder("Here are the tasks with tag #" + tag + ":\n");
@@ -222,7 +225,7 @@ public class Pichu {
     }
 
     private String formatTaskAddedMessage(Task newTask) {
-        return "Got it. I've added this task:\n  [" + newTask.getType() + "]["
+        return "GOLAZO!!!! I've added this task:\n  [" + newTask.getType() + "]["
             + newTask.getCompletion() + "] " + newTask.getName()
             + getTaskTimeInfo(newTask) + "\nNow you have " + taskList.size()
             + " task(s) in the list.";
