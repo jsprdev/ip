@@ -9,6 +9,19 @@ import pichu.task.Todo;
  * Deals with making sense of the user command.
  */
 public class Parser {
+    private static final String BYE_COMMAND = "bye";
+    private static final String LIST_COMMAND = "list";
+    private static final String MARK_COMMAND = "mark ";
+    private static final String UNMARK_COMMAND = "unmark ";
+    private static final String TODO_COMMAND = "todo ";
+    private static final String DEADLINE_COMMAND = "deadline ";
+    private static final String EVENT_COMMAND = "event ";
+    private static final String DELETE_COMMAND = "delete ";
+    private static final String FIND_COMMAND = "find ";
+
+    private static final int TODO_PREFIX_LENGTH = 5;
+    private static final int FIND_PREFIX_LENGTH = 5;
+    private static final int MIN_COMMAND_PARTS = 2;
 
     /**
      * Enum representing different command types.
@@ -24,29 +37,36 @@ public class Parser {
      * @return the CommandType enum representing the command
      */
     public static CommandType getCommandType(String input) {
-        if (input == null || input.trim().isEmpty()) {
+        if (isInvalidInput(input)) {
             return CommandType.UNKNOWN;
         }
 
         String command = input.toLowerCase().trim();
+        return mapCommandToType(command);
+    }
 
-        if (command.equals("bye")) {
+    private static boolean isInvalidInput(String input) {
+        return input == null || input.trim().isEmpty();
+    }
+
+    private static CommandType mapCommandToType(String command) {
+        if (command.equals(BYE_COMMAND)) {
             return CommandType.BYE;
-        } else if (command.equals("list")) {
+        } else if (command.equals(LIST_COMMAND)) {
             return CommandType.LIST;
-        } else if (command.startsWith("mark ")) {
+        } else if (command.startsWith(MARK_COMMAND)) {
             return CommandType.MARK;
-        } else if (command.startsWith("unmark ")) {
+        } else if (command.startsWith(UNMARK_COMMAND)) {
             return CommandType.UNMARK;
-        } else if (command.startsWith("todo ")) {
+        } else if (command.startsWith(TODO_COMMAND)) {
             return CommandType.TODO;
-        } else if (command.startsWith("deadline ")) {
+        } else if (command.startsWith(DEADLINE_COMMAND)) {
             return CommandType.DEADLINE;
-        } else if (command.startsWith("event ")) {
+        } else if (command.startsWith(EVENT_COMMAND)) {
             return CommandType.EVENT;
-        } else if (command.startsWith("delete ")) {
+        } else if (command.startsWith(DELETE_COMMAND)) {
             return CommandType.DELETE;
-        } else if (command.startsWith("find ")) {
+        } else if (command.startsWith(FIND_COMMAND)) {
             return CommandType.FIND;
         } else {
             return CommandType.UNKNOWN;
@@ -61,8 +81,8 @@ public class Parser {
      * @throws NumberFormatException if the index is not a valid number
      */
     public static int parseIndex(String input) throws NumberFormatException {
-        String[] parts = input.split(" ", 2);
-        if (parts.length < 2) {
+        String[] parts = input.split(" ", MIN_COMMAND_PARTS);
+        if (parts.length < MIN_COMMAND_PARTS) {
             throw new NumberFormatException("No index provided");
         }
         return Integer.parseInt(parts[1].trim());
@@ -77,10 +97,10 @@ public class Parser {
      * @throws IllegalArgumentException if the description is empty
      */
     public static String parseTodoDescription(String input) throws IllegalArgumentException {
-        if (input.length() <= 4 || input.substring(5).trim().isEmpty()) {
+        if (input.length() <= TODO_PREFIX_LENGTH - 1 || input.substring(TODO_PREFIX_LENGTH).trim().isEmpty()) {
             throw new IllegalArgumentException("The description of a todo cannot be empty.");
         }
-        return input.substring(5).trim();
+        return input.substring(TODO_PREFIX_LENGTH).trim();
     }
 
     /**
@@ -145,10 +165,10 @@ public class Parser {
      * @throws IllegalArgumentException if the keyword is empty
      */
     public static String parseFindKeyword(String input) throws IllegalArgumentException {
-        if (input.length() <= 4 || input.substring(5).trim().isEmpty()) {
+        if (input.length() <= FIND_PREFIX_LENGTH - 1 || input.substring(FIND_PREFIX_LENGTH).trim().isEmpty()) {
             throw new IllegalArgumentException("The search keyword cannot be empty.");
         }
-        return input.substring(5).trim();
+        return input.substring(FIND_PREFIX_LENGTH).trim();
     }
 
     /**

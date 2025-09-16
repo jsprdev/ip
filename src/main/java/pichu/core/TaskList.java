@@ -10,7 +10,8 @@ import pichu.task.Task;
  * Contains the task list and operations to add/delete tasks in the list.
  */
 public class TaskList {
-    private ArrayList<Task> tasks;
+    private static final int FIRST_TASK_INDEX = 1;
+    private final ArrayList<Task> tasks;
 
     /**
      * Creates an empty TaskList.
@@ -20,12 +21,25 @@ public class TaskList {
     }
 
     /**
-     * Creates a TaskList with the given list of tasks.
+     * Validates that the given index is within valid range.
      *
-     * @param tasks the list of tasks to initialize with
+     * @param index the 1-based index to validate
+     * @throws IndexOutOfBoundsException if the index is invalid
      */
-    public TaskList(ArrayList<Task> tasks) {
-        this.tasks = new ArrayList<>(tasks);
+    private void validateTaskIndex(int index) throws IndexOutOfBoundsException {
+        if (index < FIRST_TASK_INDEX || index > tasks.size()) {
+            throw new IndexOutOfBoundsException("Invalid task index: " + index);
+        }
+    }
+
+    /**
+     * Converts 1-based index to 0-based array index.
+     *
+     * @param userIndex the 1-based index from user input
+     * @return the 0-based array index
+     */
+    private int toArrayIndex(int userIndex) {
+        return userIndex - 1;
     }
 
     /**
@@ -45,10 +59,8 @@ public class TaskList {
      * @throws IndexOutOfBoundsException if the index is invalid
      */
     public void deleteTask(int index) throws IndexOutOfBoundsException {
-        if (index < 1 || index > tasks.size()) {
-            throw new IndexOutOfBoundsException("Invalid task index: " + index);
-        }
-        tasks.remove(index - 1);
+        validateTaskIndex(index);
+        tasks.remove(toArrayIndex(index));
     }
 
     /**
@@ -59,10 +71,8 @@ public class TaskList {
      * @throws IndexOutOfBoundsException if the index is invalid
      */
     public Task getTask(int index) throws IndexOutOfBoundsException {
-        if (index < 1 || index > tasks.size()) {
-            throw new IndexOutOfBoundsException("Invalid task index: " + index);
-        }
-        return tasks.get(index - 1);
+        validateTaskIndex(index);
+        return tasks.get(toArrayIndex(index));
     }
 
     /**
@@ -72,10 +82,8 @@ public class TaskList {
      * @throws IndexOutOfBoundsException if the index is invalid
      */
     public void markTask(int index) throws IndexOutOfBoundsException {
-        if (index < 1 || index > tasks.size()) {
-            throw new IndexOutOfBoundsException("Invalid task index: " + index);
-        }
-        tasks.get(index - 1).setCompleted(true);
+        validateTaskIndex(index);
+        tasks.get(toArrayIndex(index)).setCompleted(true);
     }
 
     /**
@@ -85,10 +93,8 @@ public class TaskList {
      * @throws IndexOutOfBoundsException if the index is invalid
      */
     public void unmarkTask(int index) throws IndexOutOfBoundsException {
-        if (index < 1 || index > tasks.size()) {
-            throw new IndexOutOfBoundsException("Invalid task index: " + index);
-        }
-        tasks.get(index - 1).setCompleted(false);
+        validateTaskIndex(index);
+        tasks.get(toArrayIndex(index)).setCompleted(false);
     }
 
     /**

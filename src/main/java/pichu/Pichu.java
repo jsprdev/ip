@@ -1,10 +1,5 @@
 package pichu;
 
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.stage.Stage;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,25 +10,31 @@ import pichu.task.Deadline;
 import pichu.task.Event;
 import pichu.task.Task;
 import pichu.task.Todo;
-import pichu.ui.TextUi;
 
 /**
  * Main class for the Pichu chatbot application.
  */
 public class Pichu {
-    private Storage storage;
-    private TaskList taskList;
-    private TextUi textUi;
-
-
     private static final String DEFAULT_FILE_PATH = "data/tasks.txt";
+    private static final String EMPTY_COMMAND_MESSAGE = "Please enter a command!";
+    private static final String UNKNOWN_COMMAND_MESSAGE = "I'm sorry, I don't know what that means! :-(";
+    private static final String GOODBYE_MESSAGE = "Bye. Hope to see you again soon!";
+    private static final String EMPTY_TASK_LIST_MESSAGE = "Your task list is empty!";
+    private static final String TASK_LIST_HEADER = "Here are the tasks in your list:\n";
+    private static final String MATCHING_TASKS_HEADER = "Here are the matching tasks in your list:\n";
+    private static final String NO_MATCHES_MESSAGE = "No matching tasks found.";
+    private static final String INVALID_NUMBER_MESSAGE = "OOPS!!! Invalid task number format.";
+    private static final String INDEX_OUT_OF_RANGE_MESSAGE = "OOPS!!! Task number is out of range.";
+    private static final String ERROR_PREFIX = "OOPS!!! ";
+
+    private final Storage storage;
+    private final TaskList taskList;
 
     /**
      * Constructor for Pichu chatbot.
      * @param filePath the file path for task storage
      */
     public Pichu(String filePath) {
-        textUi = new TextUi();
         storage = new Storage(filePath);
         taskList = new TaskList();
 
@@ -47,7 +48,6 @@ public class Pichu {
         this(DEFAULT_FILE_PATH);
     }
 
-
     /**
      * Generates a response for the user's chat message.
      */
@@ -55,167 +55,168 @@ public class Pichu {
         try {
             String fullCommand = input.trim();
             if (fullCommand.isEmpty()) {
-                return "Please enter a command!";
+                return EMPTY_COMMAND_MESSAGE;
             }
 
             Parser.CommandType commandType = Parser.getCommandType(fullCommand);
-
-            switch (commandType) {
-            case BYE:
-                return "Bye. Hope to see you again soon!";
-
-            case LIST:
-                return formatTaskList(taskList.getTasks());
-
-            case MARK:
-                return handleMarkCommandGui(fullCommand);
-
-            case UNMARK:
-                return handleUnmarkCommandGui(fullCommand);
-
-            case TODO:
-                return handleTodoCommandGui(fullCommand);
-
-            case DEADLINE:
-                return handleDeadlineCommandGui(fullCommand);
-
-            case EVENT:
-                return handleEventCommandGui(fullCommand);
-
-            case DELETE:
-                return handleDeleteCommandGui(fullCommand);
-
-            case FIND:
-                return handleFindCommandGui(fullCommand);
-
-            default:
-                return "I'm sorry, I don't know what that means! :-(";
-            }
+            return executeCommand(commandType, fullCommand);
         } catch (Exception e) {
-            return "OOPS!!! " + e.getMessage();
+            return ERROR_PREFIX + e.getMessage();
+        }
+    }
+
+    private String executeCommand(Parser.CommandType commandType, String fullCommand) {
+        switch (commandType) {
+        case BYE:
+            return GOODBYE_MESSAGE;
+        case LIST:
+            return formatTaskList(taskList.getTasks());
+        case MARK:
+            return handleMarkCommand(fullCommand);
+        case UNMARK:
+            return handleUnmarkCommand(fullCommand);
+        case TODO:
+            return handleTodoCommand(fullCommand);
+        case DEADLINE:
+            return handleDeadlineCommand(fullCommand);
+        case EVENT:
+            return handleEventCommand(fullCommand);
+        case DELETE:
+            return handleDeleteCommand(fullCommand);
+        case FIND:
+            return handleFindCommand(fullCommand);
+        default:
+            return UNKNOWN_COMMAND_MESSAGE;
         }
     }
 
     private String formatTaskList(ArrayList<Task> tasks) {
         if (tasks.isEmpty()) {
-            return "Your task list is empty!";
+            return EMPTY_TASK_LIST_MESSAGE;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Here are the tasks in your list:\n");
+        StringBuilder sb = new StringBuilder(TASK_LIST_HEADER);
         for (int i = 0; i < tasks.size(); i++) {
-            Task temp = tasks.get(i);
-            sb.append((i + 1)).append(".").append("[").append(temp.getType()).append("]").append(temp.toString()).append("\n");
+            Task task = tasks.get(i);
+            sb.append(formatTaskForDisplay(task, i + 1)).append("\n");
         }
         return sb.toString().trim();
     }
 
-    private String handleMarkCommandGui(String fullCommand) {
+    private String formatTaskForDisplay(Task task, int displayIndex) {
+        return displayIndex + ".[" + task.getType() + "]" + task;
+    }
+
+    private String handleIndexBasedCommand(String fullCommand, IndexBasedOperation operation) {
         try {
             int index = Parser.parseIndex(fullCommand);
+            return operation.execute(index);
+        } catch (NumberFormatException e) {
+            return INVALID_NUMBER_MESSAGE;
+        } catch (IndexOutOfBoundsException e) {
+            return INDEX_OUT_OF_RANGE_MESSAGE;
+        }
+    }
+
+    @FunctionalInterface
+    private interface IndexBasedOperation {
+        String execute(int index) throws IndexOutOfBoundsException;
+    }
+
+    private String handleMarkCommand(String fullCommand) {
+        return handleIndexBasedCommand(fullCommand, index -> {
             taskList.markTask(index);
             Task task = taskList.getTask(index);
             storage.saveAllTasks(taskList.getTasks());
             return "Nice! I've marked this task as done:\n[X] " + task.getName();
-        } catch (NumberFormatException e) {
-            return "OOPS!!! Invalid task number format.";
-        } catch (IndexOutOfBoundsException e) {
-            return "OOPS!!! Task number is out of range.";
-        }
+        });
     }
 
-    private String handleUnmarkCommandGui(String fullCommand) {
-        try {
-            int index = Parser.parseIndex(fullCommand);
+    private String handleUnmarkCommand(String fullCommand) {
+        return handleIndexBasedCommand(fullCommand, index -> {
             taskList.unmarkTask(index);
             Task task = taskList.getTask(index);
             storage.saveAllTasks(taskList.getTasks());
             return "OK, I've marked this task as not done yet:\n[ ] " + task.getName();
-        } catch (NumberFormatException e) {
-            return "OOPS!!! Invalid task number format.";
-        } catch (IndexOutOfBoundsException e) {
-            return "OOPS!!! Task number is out of range.";
-        }
+        });
     }
 
-    private String handleTodoCommandGui(String fullCommand) {
+    private String handleTodoCommand(String fullCommand) {
         try {
             String description = Parser.parseTodoDescription(fullCommand);
             Task newTask = new Todo(description);
             taskList.addTask(newTask);
             storage.saveTask(newTask.toFileFormat());
-            return "Got it. I've added this task:\n  [" + newTask.getType() + "][" + newTask.getCompletion() + "] " + newTask.getName() + "\nNow you have " + taskList.size() + " task(s) in the list.";
+            return formatTaskAddedMessage(newTask);
         } catch (IllegalArgumentException e) {
-            return "OOPS!!! " + e.getMessage();
+            return ERROR_PREFIX + e.getMessage();
         }
     }
 
-    private String handleDeadlineCommandGui(String fullCommand) {
+    private String handleDeadlineCommand(String fullCommand) {
         try {
             String[] parsed = Parser.parseDeadlineCommand(fullCommand);
-            String description = parsed[0];
-            String deadline = parsed[1];
-
-            Task newTask = new Deadline(description, deadline);
+            Task newTask = new Deadline(parsed[0], parsed[1]);
             taskList.addTask(newTask);
             storage.saveTask(newTask.toFileFormat());
-            return "Got it. I've added this task:\n  [" + newTask.getType() + "][" + newTask.getCompletion() + "] " + newTask.getName() + getTaskTimeInfoGui(newTask) + "\nNow you have " + taskList.size() + " task(s) in the list.";
+            return formatTaskAddedMessage(newTask);
         } catch (IllegalArgumentException e) {
-            return "OOPS!!! " + e.getMessage();
+            return ERROR_PREFIX + e.getMessage();
         }
     }
 
-    private String handleEventCommandGui(String fullCommand) {
+    private String handleEventCommand(String fullCommand) {
         try {
             String[] parsed = Parser.parseEventCommand(fullCommand);
-            String description = parsed[0];
-            String start = parsed[1];
-            String end = parsed[2];
-
-            Task newTask = new Event(description, start, end);
+            Task newTask = new Event(parsed[0], parsed[1], parsed[2]);
             taskList.addTask(newTask);
             storage.saveTask(newTask.toFileFormat());
-            return "Got it. I've added this task:\n  [" + newTask.getType() + "][" + newTask.getCompletion() + "] " + newTask.getName() + getTaskTimeInfoGui(newTask) + "\nNow you have " + taskList.size() + " task(s) in the list.";
+            return formatTaskAddedMessage(newTask);
         } catch (IllegalArgumentException e) {
-            return "OOPS!!! " + e.getMessage();
+            return ERROR_PREFIX + e.getMessage();
         }
     }
 
-    private String handleDeleteCommandGui(String fullCommand) {
-        try {
-            int index = Parser.parseIndex(fullCommand);
+    private String handleDeleteCommand(String fullCommand) {
+        return handleIndexBasedCommand(fullCommand, index -> {
             Task taskToDelete = taskList.getTask(index);
             taskList.deleteTask(index);
             storage.saveAllTasks(taskList.getTasks());
             return "Noted. I've removed this task:\n  [" + taskToDelete.getType() + "][" + taskToDelete.getCompletion() + "] " + taskToDelete.getName() + "\nNow you have " + taskList.size() + " task(s) in the list.";
-        } catch (NumberFormatException e) {
-            return "OOPS!!! Invalid task number format.";
-        } catch (IndexOutOfBoundsException e) {
-            return "OOPS!!! Task number is out of range.";
-        }
+        });
     }
 
-    private String handleFindCommandGui(String fullCommand) {
+    private String handleFindCommand(String fullCommand) {
         try {
             String keyword = Parser.parseFindKeyword(fullCommand);
             ArrayList<Task> foundTasks = taskList.findTasks(keyword);
-            if (foundTasks.isEmpty()) {
-                return "No matching tasks found.";
-            }
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("Here are the matching tasks in your list:\n");
-            for (int i = 0; i < foundTasks.size(); i++) {
-                Task temp = foundTasks.get(i);
-                sb.append((i + 1)).append(".").append("[").append(temp.getType()).append("]").append(temp.toString()).append("\n");
-            }
-            return sb.toString().trim();
+            return formatFindResults(foundTasks);
         } catch (IllegalArgumentException e) {
-            return "OOPS!!! " + e.getMessage();
+            return ERROR_PREFIX + e.getMessage();
         }
     }
 
-    private String getTaskTimeInfoGui(Task task) {
+    private String formatTaskAddedMessage(Task newTask) {
+        return "Got it. I've added this task:\n  [" + newTask.getType() + "]["
+            + newTask.getCompletion() + "] " + newTask.getName()
+            + getTaskTimeInfo(newTask) + "\nNow you have " + taskList.size()
+            + " task(s) in the list.";
+    }
+
+    private String formatFindResults(ArrayList<Task> foundTasks) {
+        if (foundTasks.isEmpty()) {
+            return NO_MATCHES_MESSAGE;
+        }
+
+        StringBuilder sb = new StringBuilder(MATCHING_TASKS_HEADER);
+        for (int i = 0; i < foundTasks.size(); i++) {
+            Task task = foundTasks.get(i);
+            sb.append(formatTaskForDisplay(task, i + 1)).append("\n");
+        }
+        return sb.toString().trim();
+    }
+
+    private String getTaskTimeInfo(Task task) {
         if (task instanceof Deadline) {
             return " (by: " + ((Deadline) task).getDeadline() + ")";
         } else if (task instanceof Event) {
@@ -225,167 +226,6 @@ public class Pichu {
         return "";
     }
 
-
-
-// DEPRECATED: Old text-based UI
-
-//    /**
-//     * Main run method to start the chatbot.
-//     */
-//    public void run() {
-//        textUi.showWelcome();
-//
-//
-//        boolean isExit = false;
-//        while (!isExit) {
-//            try {
-//                String fullCommand = textUi.readCommand();
-//                Parser.CommandType commandType = Parser.getCommandType(fullCommand);
-//
-//                switch (commandType) {
-//                case BYE:
-//                    isExit = true;
-//                    textUi.showGoodbye();
-//                    break;
-//
-//                case LIST:
-//                    textUi.showTaskList(taskList.getTasks());
-//                    break;
-//
-//                case MARK:
-//                    handleMarkCommand(fullCommand);
-//                    break;
-//
-//                case UNMARK:
-//                    handleUnmarkCommand(fullCommand);
-//                    break;
-//
-//                case TODO:
-//                    handleTodoCommand(fullCommand);
-//                    break;
-//
-//                case DEADLINE:
-//                    handleDeadlineCommand(fullCommand);
-//                    break;
-//
-//                case EVENT:
-//                    handleEventCommand(fullCommand);
-//                    break;
-//
-//                case DELETE:
-//                    handleDeleteCommand(fullCommand);
-//                    break;
-//
-//                case FIND:
-//                    handleFindCommand(fullCommand);
-//                    break;
-//
-//                default:
-//                    textUi.showError("I'm sorry, I don't know what that means! :-(");
-//                    break;
-//                }
-//            } catch (Exception e) {
-//                textUi.showError(e.getMessage());
-//            }
-//        }
+//    public static void main(String[] args) {
 //    }
-//
-//    private void handleMarkCommand(String fullCommand) {
-//        try {
-//            int index = Parser.parseIndex(fullCommand);
-//            taskList.markTask(index);
-//            Task task = taskList.getTask(index);
-//            textUi.showTaskMarked(task);
-//            storage.saveAllTasks(taskList.getTasks());
-//        } catch (NumberFormatException e) {
-//            textUi.showError("Invalid task number format.");
-//        } catch (IndexOutOfBoundsException e) {
-//            textUi.showError("Task number is out of range.");
-//        }
-//    }
-//
-//    private void handleUnmarkCommand(String fullCommand) {
-//        try {
-//            int index = Parser.parseIndex(fullCommand);
-//            taskList.unmarkTask(index);
-//            Task task = taskList.getTask(index);
-//            textUi.showTaskUnmarked(task);
-//            storage.saveAllTasks(taskList.getTasks());
-//        } catch (NumberFormatException e) {
-//            textUi.showError("Invalid task number format.");
-//        } catch (IndexOutOfBoundsException e) {
-//            textUi.showError("Task number is out of range.");
-//        }
-//    }
-//
-//    private void handleTodoCommand(String fullCommand) {
-//        try {
-//            String description = Parser.parseTodoDescription(fullCommand);
-//            Task newTask = new Todo(description);
-//            taskList.addTask(newTask);
-//            textUi.showTaskAdded(newTask, taskList.size());
-//            storage.saveTask(newTask.toFileFormat());
-//        } catch (IllegalArgumentException e) {
-//            textUi.showError(e.getMessage());
-//        }
-//    }
-//
-//    private void handleDeadlineCommand(String fullCommand) {
-//        try {
-//            String[] parsed = Parser.parseDeadlineCommand(fullCommand);
-//            String description = parsed[0];
-//            String deadline = parsed[1];
-//
-//            Task newTask = new Deadline(description, deadline);
-//            taskList.addTask(newTask);
-//            textUi.showTaskAdded(newTask, taskList.size());
-//            storage.saveTask(newTask.toFileFormat());
-//        } catch (IllegalArgumentException e) {
-//            textUi.showError(e.getMessage());
-//        }
-//    }
-//
-//    private void handleEventCommand(String fullCommand) {
-//        try {
-//            String[] parsed = Parser.parseEventCommand(fullCommand);
-//            String description = parsed[0];
-//            String start = parsed[1];
-//            String end = parsed[2];
-//
-//            Task newTask = new Event(description, start, end);
-//            taskList.addTask(newTask);
-//            textUi.showTaskAdded(newTask, taskList.size());
-//            storage.saveTask(newTask.toFileFormat());
-//        } catch (IllegalArgumentException e) {
-//            textUi.showError(e.getMessage());
-//        }
-//    }
-//
-//    private void handleDeleteCommand(String fullCommand) {
-//        try {
-//            int index = Parser.parseIndex(fullCommand);
-//            taskList.deleteTask(index);
-//            textUi.showTaskDeleted();
-//            storage.saveAllTasks(taskList.getTasks());
-//        } catch (NumberFormatException e) {
-//            textUi.showError("Invalid task number format.");
-//        } catch (IndexOutOfBoundsException e) {
-//            textUi.showError("Task number is out of range.");
-//        }
-//    }
-//
-//    private void handleFindCommand(String fullCommand) {
-//        try {
-//            String keyword = Parser.parseFindKeyword(fullCommand);
-//            ArrayList<Task> foundTasks = taskList.findTasks(keyword);
-//            textUi.showFindResults(foundTasks);
-//        } catch (IllegalArgumentException e) {
-//            textUi.showError(e.getMessage());
-//        }
-//    }
-
-
-    public static void main(String[] args) {
-//        new Pichu("data/tasks.txt").run();
-    }
 }
