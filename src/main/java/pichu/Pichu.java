@@ -85,6 +85,8 @@ public class Pichu {
             return handleDeleteCommand(fullCommand);
         case FIND:
             return handleFindCommand(fullCommand);
+        case TAG:
+            return handleTagCommand(fullCommand);
         default:
             return UNKNOWN_COMMAND_MESSAGE;
         }
@@ -184,6 +186,29 @@ public class Pichu {
             storage.saveAllTasks(taskList.getTasks());
             return "Noted. I've removed this task:\n  [" + taskToDelete.getType() + "][" + taskToDelete.getCompletion() + "] " + taskToDelete.getName() + "\nNow you have " + taskList.size() + " task(s) in the list.";
         });
+    }
+
+    private String handleTagCommand(String fullCommand) {
+        try {
+            String tag = Parser.parseTagKeyword(fullCommand);
+            ArrayList<Task> foundTasks = taskList.findTasksByTag(tag);
+            return formatTagResults(foundTasks, tag);
+        } catch (IllegalArgumentException e) {
+            return ERROR_PREFIX + e.getMessage();
+        }
+    }
+
+    private String formatTagResults(ArrayList<Task> foundTasks, String tag) {
+        if (foundTasks.isEmpty()) {
+            return "No tasks found with tag #" + tag + ".";
+        }
+
+        StringBuilder sb = new StringBuilder("Here are the tasks with tag #" + tag + ":\n");
+        for (int i = 0; i < foundTasks.size(); i++) {
+            Task task = foundTasks.get(i);
+            sb.append(formatTaskForDisplay(task, i + 1)).append("\n");
+        }
+        return sb.toString().trim();
     }
 
     private String handleFindCommand(String fullCommand) {

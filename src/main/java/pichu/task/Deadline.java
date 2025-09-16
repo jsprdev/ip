@@ -78,7 +78,9 @@ public class Deadline extends Task {
 
     @Override
     public String getType() {
-        return "D";
+        String completionStatus = isCompleted() ? COMPLETED_STATUS_FILE : INCOMPLETE_STATUS_FILE;
+        String tagsString = String.join(",", getTags());
+        return "D|" + completionStatus + "|" + getName() + "|" + originalInput + "|" + tagsString;
     }
 
     @Override

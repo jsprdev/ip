@@ -18,16 +18,18 @@ public class Parser {
     private static final String EVENT_COMMAND = "event ";
     private static final String DELETE_COMMAND = "delete ";
     private static final String FIND_COMMAND = "find ";
+    private static final String TAG_COMMAND = "tag ";
 
     private static final int TODO_PREFIX_LENGTH = 5;
     private static final int FIND_PREFIX_LENGTH = 5;
+    private static final int TAG_PREFIX_LENGTH = 4;
     private static final int MIN_COMMAND_PARTS = 2;
 
     /**
      * Enum representing different command types.
      */
     public enum CommandType {
-        BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, FIND, UNKNOWN
+        BYE, LIST, MARK, UNMARK, TODO, DEADLINE, EVENT, DELETE, FIND, TAG, UNKNOWN
     }
 
     /**
@@ -68,6 +70,8 @@ public class Parser {
             return CommandType.DELETE;
         } else if (command.startsWith(FIND_COMMAND)) {
             return CommandType.FIND;
+        } else if (command.startsWith(TAG_COMMAND)) {
+            return CommandType.TAG;
         } else {
             return CommandType.UNKNOWN;
         }
@@ -158,6 +162,25 @@ public class Parser {
     }
 
     /**
+     * Parses a tag command to extract the search tag.
+     *
+     * @param input the user's input command
+     * @return the search tag (without # symbol)
+     * @throws IllegalArgumentException if the tag is empty
+     */
+    public static String parseTagKeyword(String input) throws IllegalArgumentException {
+        if (input.length() <= TAG_PREFIX_LENGTH - 1 || input.substring(TAG_PREFIX_LENGTH).trim().isEmpty()) {
+            throw new IllegalArgumentException("The search tag cannot be empty.");
+        }
+        String tag = input.substring(TAG_PREFIX_LENGTH).trim();
+        // Remove # symbol if present
+        if (tag.startsWith("#")) {
+            tag = tag.substring(1);
+        }
+        return tag;
+    }
+
+    /**
      * Parses a find command to extract the search keyword.
      *
      * @param input the user's input command
@@ -195,16 +218,37 @@ public class Parser {
 
         switch (type) {
         case "T":
+            // Format: T|completion|description|tags
             task = new Todo(description);
+            if (parts.length >= 4 && !parts[3].trim().isEmpty()) {
+                String[] tags = parts[3].split(",");
+                for (String tag : tags) {
+                    task.addTag(tag.trim());
+                }
+            }
             break;
         case "D":
+            // Format: D|completion|description|deadline|tags
             if (parts.length >= 4) {
                 task = new Deadline(description, parts[3]);
+                if (parts.length >= 5 && !parts[4].trim().isEmpty()) {
+                    String[] tags = parts[4].split(",");
+                    for (String tag : tags) {
+                        task.addTag(tag.trim());
+                    }
+                }
             }
             break;
         case "E":
+            // Format: E|completion|description|start|end|tags
             if (parts.length >= 5) {
                 task = new Event(description, parts[3], parts[4]);
+                if (parts.length >= 6 && !parts[5].trim().isEmpty()) {
+                    String[] tags = parts[5].split(",");
+                    for (String tag : tags) {
+                        task.addTag(tag.trim());
+                    }
+                }
             }
             break;
         default:

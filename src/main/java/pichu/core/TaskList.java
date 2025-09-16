@@ -116,6 +116,22 @@ public class TaskList {
     }
 
     /**
+     * Finds tasks that have the specified tag.
+     *
+     * @param tag the tag to search for (without # symbol)
+     * @return a list of tasks that have the specified tag
+     */
+    public ArrayList<Task> findTasksByTag(String tag) {
+        ArrayList<Task> matchingTasks = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task.hasTag(tag)) {
+                matchingTasks.add(task);
+            }
+        }
+        return matchingTasks;
+    }
+
+    /**
      * Finds tasks that contain the specified keyword in their description.
      *
      * @param keyword the keyword to search for

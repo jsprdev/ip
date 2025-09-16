@@ -116,6 +116,8 @@ public class Event extends Task {
 
     @Override
     public String toFileFormat() {
-        return "E|" + (isCompleted() ? "1" : "0") + "|" + getName() + "|" + originalStartInput + "|" + originalEndInput;
+        String completionStatus = isCompleted() ? COMPLETED_STATUS_FILE : INCOMPLETE_STATUS_FILE;
+        String tagsString = String.join(",", getTags());
+        return "E|" + completionStatus + "|" + getName() + "|" + originalStartInput + "|" + originalEndInput + "|" + tagsString;
     }
 }
