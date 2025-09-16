@@ -66,18 +66,28 @@ public class Pichu {
     }
 
     private String executeCommand(Parser.CommandType commandType, String fullCommand) {
-        return switch (commandType) {
-            case BYE -> GOODBYE_MESSAGE;
-            case LIST -> formatTaskList(taskList.getTasks());
-            case MARK -> handleMarkCommand(fullCommand);
-            case UNMARK -> handleUnmarkCommand(fullCommand);
-            case TODO -> handleTodoCommand(fullCommand);
-            case DEADLINE -> handleDeadlineCommand(fullCommand);
-            case EVENT -> handleEventCommand(fullCommand);
-            case DELETE -> handleDeleteCommand(fullCommand);
-            case FIND -> handleFindCommand(fullCommand);
-            default -> UNKNOWN_COMMAND_MESSAGE;
-        };
+        switch (commandType) {
+        case BYE:
+            return GOODBYE_MESSAGE;
+        case LIST:
+            return formatTaskList(taskList.getTasks());
+        case MARK:
+            return handleMarkCommand(fullCommand);
+        case UNMARK:
+            return handleUnmarkCommand(fullCommand);
+        case TODO:
+            return handleTodoCommand(fullCommand);
+        case DEADLINE:
+            return handleDeadlineCommand(fullCommand);
+        case EVENT:
+            return handleEventCommand(fullCommand);
+        case DELETE:
+            return handleDeleteCommand(fullCommand);
+        case FIND:
+            return handleFindCommand(fullCommand);
+        default:
+            return UNKNOWN_COMMAND_MESSAGE;
+        }
     }
 
     private String formatTaskList(ArrayList<Task> tasks) {
@@ -216,7 +226,6 @@ public class Pichu {
         return "";
     }
 
-    public static void main(String[] args) {
-        // Main method for potential future use
-    }
+//    public static void main(String[] args) {
+//    }
 }
