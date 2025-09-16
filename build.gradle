@@ -3,6 +3,7 @@ plugins {
     id 'java'
     id 'application'
     id 'checkstyle'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 // Global JVM settings for all Gradle tasks
@@ -91,7 +92,13 @@ application {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'pichu.Pichu'
+        attributes 'Main-Class': 'Launcher'
+    }
+}
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': 'Launcher'
     }
 }
 
