@@ -47,6 +47,7 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
+
         //Formatting the window to look as expected
 
         stage.setTitle("Pichu");
